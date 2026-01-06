@@ -270,7 +270,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-**Project Link**: [https://github.com/YOUR_USERNAME/vanet_RL](https://github.com/YOUR_USERNAME/vanet_RL)
+**Project Link**: [https://github.com/jeevanchiru17/vanet_RL](https://github.com/jeevanchiru17/vanet_RL)
 
 ## 🎓 Citation
 
