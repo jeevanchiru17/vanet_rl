@@ -1,0 +1,97 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# PyTorch
+*.pth
+*.pt
+checkpoints/
+
+# NS-3
+ns-3.46/build/
+ns-3.46/.lock-ns3*
+ns-3.46/.waf*
+ns-3.46/waf
+ns-3.46/testpy-output/
+ns-3.46/*.pyc
+
+# Results and Logs
+vanet-dqn-results/
+*.log
+*.csv
+*.xml
+*.pcap
+*.tr
+
+# Keep important files
+!requirements.txt
+!docs/*.md
+!*.md
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Plots
+*.png
+*.jpg
+*.pdf
+!docs/*.png
+!docs/*.jpg
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
+
+# NetSimulyzer
+NetSimulyzer/build/
+NetSimulyzer/.cache/
+
+# Exclude large NS-3 directories but keep source
+ns-3.46/src/*/examples/
+ns-3.46/src/*/test/
+ns-3.46/contrib/*/examples/
+ns-3.46/contrib/*/test/
+
+# Keep important files
+!ns-3.46/scratch/vanet-dqn-simulation.cc
+!ns-3.46/scratch/vanet-netsimulyzer-test.cc
+NetSimulyzer/

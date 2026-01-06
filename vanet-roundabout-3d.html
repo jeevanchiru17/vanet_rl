@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VANET Realistic Roundabout - Advanced Computer Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0e27;
+            color: #e0e6ed;
+            overflow: hidden;
+        }
+
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 320px;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+        }
+
+        #info-panel h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 0.85em;
+            color: #94a3b8;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.85em;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .slider {
+            width: 220px;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(148, 163, 184, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            cursor: pointer;
+            border: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(96, 165, 250, 0.4);
+        }
+
+        #legend {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .legend-label {
+            font-size: 0.9em;
+            color: #e0e6ed;
+        }
+
+        .info-text {
+            background: rgba(96, 165, 250, 0.1);
+            border-left: 3px solid #60a5fa;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            color: #cbd5e1;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+
+    <div id="info-panel">
+        <h1>🚗 VANET Roundabout</h1>
+        <p class="subtitle">Advanced Computer Network Project</p>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="vehicleCount">15</div>
+                <div class="stat-label">Vehicles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="currentTime">0.0s</div>
+                <div class="stat-label">Simulation Time</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="speedDisplay">35</div>
+                <div class="stat-label">Avg Speed (km/h)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="activeConnections">0</div>
+                <div class="stat-label">V2V Links</div>
+            </div>
+        </div>
+
+        <div class="info-text">
+            🎯 <strong>Realistic Multi-Lane Roundabout</strong><br>
+            Vehicles follow traffic rules: yielding, safe distance (20m), speed limits, and proper lane discipline!
+        </div>
+    </div>
+
+    <div id="controls">
+        <div class="control-group">
+            <label>Animation Speed: <span id="speedValue">1.0x</span></label>
+            <input type="range" class="slider" id="speedSlider" min="0.1" max="3" step="0.1" value="1">
+        </div>
+        <div class="control-group checkbox-group">
+            <input type="checkbox" id="showTrails" checked>
+            <label for="showTrails" style="margin: 0;">Motion Trails</label>
+        </div>
+        <div class="control-group checkbox-group">
+            <input type="checkbox" id="showConnections" checked>
+            <label for="showConnections" style="margin: 0;">V2V Links</label>
+        </div>
+        <div class="control-group checkbox-group">
+            <input type="checkbox" id="showLabels" checked>
+            <label for="showLabels" style="margin: 0;">Vehicle IDs</label>
+        </div>
+        <div class="control-group">
+            <button class="btn" id="playPauseBtn" onclick="togglePlayPause()">⏸️ Pause</button>
+            <button class="btn" onclick="resetAnimation()">🔄 Reset</button>
+        </div>
+    </div>
+
+    <div id="legend">
+        <h3 style="margin-bottom: 15px; font-size: 1.1em;">Legend</h3>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #3b82f6;"></div>
+            <div class="legend-label">Vehicle (Vibrant Blue)</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #c084fc;"></div>
+            <div class="legend-label">Motion Trail (Purple)</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #10b981;"></div>
+            <div class="legend-label">V2V Link (Emerald)</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #1a1a1a;"></div>
+            <div class="legend-label">Road (Black)</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #fbbf24;"></div>
+            <div class="legend-label">Roundabout (Gold)</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #22c55e;"></div>
+            <div class="legend-label">Grass (Vibrant Green)</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer;
+        let vehicles = [];
+        let trails = [];
+        let connections = [];
+        let labels = [];
+        let isPlaying = true;
+        let animationSpeed = 1.0;
+        let simulationTime = 0;
+
+        const COLORS = {
+            background: 0x0a0e27,
+            vehicle: 0x3b82f6,        // Vibrant blue
+            trail: 0xc084fc,          // Vibrant purple
+            road: 0x1a1a1a,
+            roundabout: 0xfbbf24,     // Bright yellow/gold
+            connection: 0x10b981,     // Bright emerald green
+            grass: 0x22c55e,          // Vibrant green
+            marking: 0xffffff,
+            centerIsland: 0x86efac    // Light vibrant green
+        };
+
+        const ROUNDABOUT_RADIUS = 90;
+        const INNER_LANE_RADIUS = 70;
+        const OUTER_LANE_RADIUS = 90;
+        const ROAD_WIDTH = 40;
+        const LANE_WIDTH = 12;
+        const COMMUNICATION_RANGE = 150;
+
+        // Traffic rules constants
+        const SAFE_DISTANCE = 20;
+        const APPROACH_SPEED_LIMIT = 0.5;
+        const ROUNDABOUT_SPEED_LIMIT = 0.35;
+        const EXIT_SPEED_LIMIT = 0.45;
+        const YIELD_DISTANCE = 35;
+
+        function initScene() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(COLORS.background);
+            scene.fog = new THREE.Fog(COLORS.background, 400, 1000);
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+            camera.position.set(0, 400, 400);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('container').appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);  // Brighter ambient
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);  // Stronger light
+            directionalLight.position.set(300, 400, 300);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.camera.left = -500;
+            directionalLight.shadow.camera.right = 500;
+            directionalLight.shadow.camera.top = 500;
+            directionalLight.shadow.camera.bottom = -500;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            scene.add(directionalLight);
+
+            // Add point light for extra vibrancy
+            const pointLight = new THREE.PointLight(0xffffff, 0.5, 500);
+            pointLight.position.set(0, 200, 0);
+            scene.add(pointLight);
+
+            createEnvironment();
+            createVehicles();
+            addOrbitControls();
+            window.addEventListener('resize', onWindowResize);
+            animate();
+        }
+
+        function createEnvironment() {
+            // Grass base
+            const grassGeometry = new THREE.CircleGeometry(300, 64);
+            const grassMaterial = new THREE.MeshStandardMaterial({
+                color: COLORS.grass,
+                roughness: 0.9
+            });
+            const grass = new THREE.Mesh(grassGeometry, grassMaterial);
+            grass.rotation.x = -Math.PI / 2;
+            grass.position.y = -0.5;
+            grass.receiveShadow = true;
+            scene.add(grass);
+
+            // Center island
+            const islandGeometry = new THREE.CircleGeometry(INNER_LANE_RADIUS - LANE_WIDTH, 32);
+            const islandMaterial = new THREE.MeshStandardMaterial({
+                color: COLORS.centerIsland,
+                roughness: 0.8
+            });
+            const island = new THREE.Mesh(islandGeometry, islandMaterial);
+            island.rotation.x = -Math.PI / 2;
+            island.position.y = 0.2;
+            scene.add(island);
+
+            // Multi-lane roundabout (2 lanes)
+            const innerLaneGeometry = new THREE.RingGeometry(
+                INNER_LANE_RADIUS - LANE_WIDTH,
+                INNER_LANE_RADIUS,
+                64
+            );
+            const outerLaneGeometry = new THREE.RingGeometry(
+                INNER_LANE_RADIUS,
+                OUTER_LANE_RADIUS,
+                64
+            );
+
+            const roundaboutMaterial = new THREE.MeshStandardMaterial({
+                color: COLORS.roundabout,
+                roughness: 0.7
+            });
+
+            const innerLane = new THREE.Mesh(innerLaneGeometry, roundaboutMaterial);
+            innerLane.rotation.x = -Math.PI / 2;
+            innerLane.receiveShadow = true;
+            scene.add(innerLane);
+
+            const outerLane = new THREE.Mesh(outerLaneGeometry, roundaboutMaterial);
+            outerLane.rotation.x = -Math.PI / 2;
+            outerLane.receiveShadow = true;
+            scene.add(outerLane);
+
+            // Lane divider (dashed white line)
+            for (let i = 0; i < 32; i++) {
+                const angle = (i / 32) * Math.PI * 2;
+                const markGeometry = new THREE.BoxGeometry(2, 0.2, 8);
+                const markMaterial = new THREE.MeshStandardMaterial({ color: COLORS.marking });
+                const mark = new THREE.Mesh(markGeometry, markMaterial);
+                mark.position.x = Math.cos(angle) * INNER_LANE_RADIUS;
+                mark.position.z = Math.sin(angle) * INNER_LANE_RADIUS;
+                mark.position.y = 0.2;
+                mark.rotation.y = -angle;
+                scene.add(mark);
+            }
+
+            // 4 approach roads with 2 lanes each
+            const roadPositions = [
+                { angle: 0, name: 'East' },
+                { angle: Math.PI / 2, name: 'North' },
+                { angle: Math.PI, name: 'West' },
+                { angle: 3 * Math.PI / 2, name: 'South' }
+            ];
+
+            roadPositions.forEach(road => {
+                const roadLength = 180;
+                // Swap width and length so road extends in Z direction, then rotate
+                const roadGeometry = new THREE.BoxGeometry(roadLength, 0.5, ROAD_WIDTH);
+                const roadMaterial = new THREE.MeshStandardMaterial({
+                    color: COLORS.road,
+                    roughness: 0.8
+                });
+                const roadMesh = new THREE.Mesh(roadGeometry, roadMaterial);
+
+                const distance = OUTER_LANE_RADIUS + roadLength / 2;
+                roadMesh.position.x = Math.cos(road.angle) * distance;
+                roadMesh.position.z = Math.sin(road.angle) * distance;
+                roadMesh.rotation.y = road.angle;  // Positive angle for correct rotation
+                roadMesh.receiveShadow = true;
+                scene.add(roadMesh);
+
+                // Center lane divider (dashed white line along road)
+                for (let i = 0; i < 8; i++) {
+                    const markGeometry = new THREE.BoxGeometry(12, 0.3, 2);  // Swapped for road direction
+                    const markMaterial = new THREE.MeshStandardMaterial({ color: COLORS.marking });
+                    const mark = new THREE.Mesh(markGeometry, markMaterial);
+                    const markDist = OUTER_LANE_RADIUS + 20 + i * 20;
+                    mark.position.x = Math.cos(road.angle) * markDist;
+                    mark.position.z = Math.sin(road.angle) * markDist;
+                    mark.position.y = 0.3;
+                    mark.rotation.y = road.angle;  // Align with road
+                    scene.add(mark);
+                }
+
+                // Edge markings (along both sides of road)
+                [-ROAD_WIDTH / 2 + 2, ROAD_WIDTH / 2 - 2].forEach(offset => {
+                    for (let i = 0; i < 8; i++) {
+                        const markGeometry = new THREE.BoxGeometry(10, 0.3, 1.5);  // Swapped for road direction
+                        const markMaterial = new THREE.MeshStandardMaterial({ color: COLORS.marking });
+                        const mark = new THREE.Mesh(markGeometry, markMaterial);
+                        const markDist = OUTER_LANE_RADIUS + 20 + i * 20;
+                        const perpAngle = road.angle + Math.PI / 2;
+                        mark.position.x = Math.cos(road.angle) * markDist + Math.cos(perpAngle) * offset;
+                        mark.position.z = Math.sin(road.angle) * markDist + Math.sin(perpAngle) * offset;
+                        mark.position.y = 0.3;
+                        mark.rotation.y = road.angle;  // Align with road
+                        scene.add(mark);
+                    }
+                });
+            });
+
+            // Yield triangles at entries
+            roadPositions.forEach(road => {
+                const triangleShape = new THREE.Shape();
+                triangleShape.moveTo(0, 0);
+                triangleShape.lineTo(3, 5);
+                triangleShape.lineTo(-3, 5);
+                triangleShape.lineTo(0, 0);
+
+                const triangleGeometry = new THREE.ShapeGeometry(triangleShape);
+                const triangleMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xffffff,
+                    side: THREE.DoubleSide
+                });
+                const triangle = new THREE.Mesh(triangleGeometry, triangleMaterial);
+                triangle.rotation.x = -Math.PI / 2;
+                triangle.rotation.z = road.angle;
+                const dist = OUTER_LANE_RADIUS + 10;
+                triangle.position.x = Math.cos(road.angle) * dist;
+                triangle.position.z = Math.sin(road.angle) * dist;
+                triangle.position.y = 0.3;
+                scene.add(triangle);
+            });
+        }
+
+        function createVehicle() {
+            const carGroup = new THREE.Group();
+
+            const bodyGeometry = new THREE.BoxGeometry(8, 4, 14);
+            const bodyMaterial = new THREE.MeshStandardMaterial({
+                color: COLORS.vehicle,
+                metalness: 0.6,
+                roughness: 0.3
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = 2;
+            body.castShadow = true;
+            carGroup.add(body);
+
+            const roofGeometry = new THREE.BoxGeometry(6, 3, 8);
+            const roof = new THREE.Mesh(roofGeometry, bodyMaterial);
+            roof.position.y = 5.5;
+            roof.position.z = -1;
+            roof.castShadow = true;
+            carGroup.add(roof);
+
+            const wheelGeometry = new THREE.CylinderGeometry(1.5, 1.5, 1.5, 16);
+            const wheelMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1a1a1a,
+                metalness: 0.8,
+                roughness: 0.2
+            });
+
+            const wheelPositions = [
+                { x: -4, z: 5 },
+                { x: 4, z: 5 },
+                { x: -4, z: -5 },
+                { x: 4, z: -5 }
+            ];
+
+            wheelPositions.forEach(pos => {
+                const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+                wheel.rotation.z = Math.PI / 2;
+                wheel.position.set(pos.x, 1.5, pos.z);
+                wheel.castShadow = true;
+                carGroup.add(wheel);
+            });
+
+            const lightGeometry = new THREE.BoxGeometry(2, 1, 0.5);
+            const lightMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffffaa,
+                emissive: 0xffffaa,
+                emissiveIntensity: 0.5
+            });
+            const leftLight = new THREE.Mesh(lightGeometry, lightMaterial);
+            leftLight.position.set(-3, 2, 7.5);
+            carGroup.add(leftLight);
+            const rightLight = new THREE.Mesh(lightGeometry, lightMaterial);
+            rightLight.position.set(3, 2, 7.5);
+            carGroup.add(rightLight);
+
+            return carGroup;
+        }
+
+        function createVehicles() {
+            const numVehicles = 15;
+
+            for (let i = 0; i < numVehicles; i++) {
+                const vehicle = createVehicle();
+
+                const roadIndex = Math.floor(Math.random() * 4);
+                const angle = roadIndex * Math.PI / 2;
+                const distance = OUTER_LANE_RADIUS + 50 + Math.random() * 100;
+                const lane = Math.random() < 0.5 ? 'inner' : 'outer';
+
+                vehicle.position.x = Math.cos(angle) * distance;
+                vehicle.position.z = Math.sin(angle) * distance;
+                vehicle.rotation.y = -angle + Math.PI;
+
+                scene.add(vehicle);
+
+                vehicles.push({
+                    mesh: vehicle,
+                    angle: angle,
+                    speed: 0.3 + Math.random() * 0.2,
+                    state: 'approaching',
+                    targetExit: (roadIndex + 1 + Math.floor(Math.random() * 3)) % 4,
+                    lane: lane,
+                    laneRadius: lane === 'inner' ? INNER_LANE_RADIUS - LANE_WIDTH / 2 : OUTER_LANE_RADIUS - LANE_WIDTH / 2,
+                    trailPoints: [],
+                    id: i
+                });
+
+                if (document.getElementById('showLabels').checked) {
+                    createLabel(vehicle, i);
+                }
+            }
+        }
+
+        function createLabel(vehicle, id) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 128;
+            canvas.height = 64;
+
+            context.fillStyle = 'rgba(15, 23, 42, 0.8)';
+            context.fillRect(0, 0, 128, 64);
+
+            context.font = 'Bold 24px Arial';
+            context.fillStyle = '#60a5fa';
+            context.textAlign = 'center';
+            context.fillText('V-' + id, 64, 40);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(20, 10, 1);
+            sprite.position.y = 15;
+            vehicle.add(sprite);
+            labels.push(sprite);
+        }
+
+        function updateVehicles(delta) {
+            vehicles.forEach((vehicle, index) => {
+                const pos = vehicle.mesh.position;
+                const distFromCenter = Math.sqrt(pos.x * pos.x + pos.z * pos.z);
+
+                const vehicleAhead = checkVehicleAhead(vehicle, index);
+                let canMove = true;
+                let speedAdjustment = 1.0;
+
+                if (vehicleAhead) {
+                    const distance = pos.distanceTo(vehicleAhead.mesh.position);
+                    if (distance < SAFE_DISTANCE) {
+                        if (distance < SAFE_DISTANCE / 2) {
+                            canMove = false;
+                        } else {
+                            speedAdjustment = (distance - SAFE_DISTANCE / 2) / (SAFE_DISTANCE / 2);
+                        }
+                    }
+                }
+
+                if (vehicle.state === 'approaching') {
+                    const targetDist = vehicle.laneRadius;
+
+                    if (distFromCenter > targetDist + 15) {
+                        const currentSpeed = Math.min(vehicle.speed, APPROACH_SPEED_LIMIT) * speedAdjustment;
+
+                        if (canMove) {
+                            vehicle.mesh.position.x -= Math.cos(vehicle.angle) * currentSpeed * delta * 60;
+                            vehicle.mesh.position.z -= Math.sin(vehicle.angle) * currentSpeed * delta * 60;
+                        }
+                    } else {
+                        const shouldYield = checkYieldToRoundabout(vehicle, index);
+
+                        if (!shouldYield && canMove) {
+                            vehicle.state = 'roundabout';
+                            vehicle.roundaboutAngle = Math.atan2(pos.z, pos.x);
+                            vehicle.speed = ROUNDABOUT_SPEED_LIMIT;
+                        } else if (!shouldYield) {
+                            const yieldSpeed = Math.min(vehicle.speed, APPROACH_SPEED_LIMIT * 0.3);
+                            vehicle.mesh.position.x -= Math.cos(vehicle.angle) * yieldSpeed * delta * 60;
+                            vehicle.mesh.position.z -= Math.sin(vehicle.angle) * yieldSpeed * delta * 60;
+                        }
+                    }
+                } else if (vehicle.state === 'roundabout') {
+                    const roundaboutSpeed = Math.min(vehicle.speed, ROUNDABOUT_SPEED_LIMIT) * speedAdjustment;
+                    const targetAngle = vehicle.targetExit * Math.PI / 2;
+
+                    if (canMove) {
+                        vehicle.roundaboutAngle += roundaboutSpeed * delta * 0.5;
+                    }
+
+                    const angleDiff = ((vehicle.roundaboutAngle - targetAngle + Math.PI) % (2 * Math.PI)) - Math.PI;
+                    if (Math.abs(angleDiff) < 0.2) {
+                        vehicle.state = 'exiting';
+                        vehicle.angle = targetAngle;
+                        vehicle.speed = EXIT_SPEED_LIMIT;
+                    }
+
+                    vehicle.mesh.position.x = Math.cos(vehicle.roundaboutAngle) * vehicle.laneRadius;
+                    vehicle.mesh.position.z = Math.sin(vehicle.roundaboutAngle) * vehicle.laneRadius;
+                    vehicle.mesh.rotation.y = -vehicle.roundaboutAngle - Math.PI / 2;
+                } else if (vehicle.state === 'exiting') {
+                    const exitSpeed = Math.min(vehicle.speed, EXIT_SPEED_LIMIT) * speedAdjustment;
+
+                    if (canMove) {
+                        vehicle.mesh.position.x += Math.cos(vehicle.angle) * exitSpeed * delta * 60;
+                        vehicle.mesh.position.z += Math.sin(vehicle.angle) * exitSpeed * delta * 60;
+                    }
+                    vehicle.mesh.rotation.y = -vehicle.angle + Math.PI;
+
+                    if (distFromCenter > 280) {
+                        const newRoadIndex = Math.floor(Math.random() * 4);
+                        const newAngle = newRoadIndex * Math.PI / 2;
+                        const distance = OUTER_LANE_RADIUS + 50 + Math.random() * 100;
+                        const newLane = Math.random() < 0.5 ? 'inner' : 'outer';
+
+                        vehicle.mesh.position.x = Math.cos(newAngle) * distance;
+                        vehicle.mesh.position.z = Math.sin(newAngle) * distance;
+                        vehicle.angle = newAngle;
+                        vehicle.mesh.rotation.y = -newAngle + Math.PI;
+                        vehicle.state = 'approaching';
+                        vehicle.speed = 0.3 + Math.random() * 0.2;
+                        vehicle.lane = newLane;
+                        vehicle.laneRadius = newLane === 'inner' ? INNER_LANE_RADIUS - LANE_WIDTH / 2 : OUTER_LANE_RADIUS - LANE_WIDTH / 2;
+                        vehicle.targetExit = (newRoadIndex + 1 + Math.floor(Math.random() * 3)) % 4;
+                        vehicle.trailPoints = [];
+                    }
+                }
+
+                if (document.getElementById('showTrails').checked) {
+                    vehicle.trailPoints.push(vehicle.mesh.position.clone());
+                    if (vehicle.trailPoints.length > 100) {
+                        vehicle.trailPoints.shift();
+                    }
+                }
+            });
+
+            updateTrails();
+            updateConnections();
+        }
+
+        function checkVehicleAhead(currentVehicle, currentIndex) {
+            const currentPos = currentVehicle.mesh.position;
+            const currentAngle = currentVehicle.state === 'roundabout' ?
+                currentVehicle.roundaboutAngle : currentVehicle.angle;
+
+            let closestVehicle = null;
+            let minDistance = Infinity;
+
+            vehicles.forEach((otherVehicle, index) => {
+                if (index === currentIndex) return;
+                if (currentVehicle.state === 'roundabout' && otherVehicle.lane !== currentVehicle.lane) return;
+
+                const otherPos = otherVehicle.mesh.position;
+                const distance = currentPos.distanceTo(otherPos);
+
+                if (distance > SAFE_DISTANCE * 2) return;
+
+                const dx = otherPos.x - currentPos.x;
+                const dz = otherPos.z - currentPos.z;
+                const angleToOther = Math.atan2(dz, dx);
+
+                let travelDirection;
+                if (currentVehicle.state === 'approaching') {
+                    travelDirection = currentAngle + Math.PI;
+                } else if (currentVehicle.state === 'roundabout') {
+                    travelDirection = currentAngle + Math.PI / 2;
+                } else {
+                    travelDirection = currentAngle;
+                }
+
+                const angleDiff = Math.abs(((angleToOther - travelDirection + Math.PI) % (2 * Math.PI)) - Math.PI);
+
+                if (angleDiff < Math.PI / 4 && distance < minDistance) {
+                    minDistance = distance;
+                    closestVehicle = otherVehicle;
+                }
+            });
+
+            return closestVehicle;
+        }
+
+        function checkYieldToRoundabout(vehicle, currentIndex) {
+            const vehiclePos = vehicle.mesh.position;
+
+            for (let i = 0; i < vehicles.length; i++) {
+                if (i === currentIndex) continue;
+
+                const otherVehicle = vehicles[i];
+                if (otherVehicle.state !== 'roundabout') continue;
+
+                const otherPos = otherVehicle.mesh.position;
+                const distance = vehiclePos.distanceTo(otherPos);
+
+                if (distance < YIELD_DISTANCE) {
+                    const angleToOther = Math.atan2(
+                        otherPos.z - vehiclePos.z,
+                        otherPos.x - vehiclePos.x
+                    );
+                    const relativeAngle = ((angleToOther - vehicle.angle + Math.PI) % (2 * Math.PI)) - Math.PI;
+
+                    if (relativeAngle > -Math.PI / 2 && relativeAngle < Math.PI / 2) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        function updateTrails() {
+            trails.forEach(trail => scene.remove(trail));
+            trails = [];
+
+            if (!document.getElementById('showTrails').checked) return;
+
+            vehicles.forEach(vehicle => {
+                if (vehicle.trailPoints.length > 1) {
+                    const points = vehicle.trailPoints.map(p => new THREE.Vector3(p.x, 0.5, p.z));
+                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                    const material = new THREE.LineBasicMaterial({
+                        color: COLORS.trail,
+                        transparent: true,
+                        opacity: 0.5
+                    });
+                    const trail = new THREE.Line(geometry, material);
+                    scene.add(trail);
+                    trails.push(trail);
+                }
+            });
+        }
+
+        function updateConnections() {
+            connections.forEach(conn => scene.remove(conn));
+            connections = [];
+
+            if (!document.getElementById('showConnections').checked) return;
+
+            let activeLinks = 0;
+
+            for (let i = 0; i < vehicles.length; i++) {
+                for (let j = i + 1; j < vehicles.length; j++) {
+                    const v1 = vehicles[i].mesh.position;
+                    const v2 = vehicles[j].mesh.position;
+                    const distance = v1.distanceTo(v2);
+
+                    if (distance < COMMUNICATION_RANGE) {
+                        const points = [
+                            new THREE.Vector3(v1.x, 5, v1.z),
+                            new THREE.Vector3(v2.x, 5, v2.z)
+                        ];
+                        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                        const material = new THREE.LineBasicMaterial({
+                            color: COLORS.connection,
+                            transparent: true,
+                            opacity: 0.4
+                        });
+                        const connection = new THREE.Line(geometry, material);
+                        scene.add(connection);
+                        connections.push(connection);
+                        activeLinks++;
+                    }
+                }
+            }
+
+            document.getElementById('activeConnections').textContent = activeLinks;
+        }
+
+        function addOrbitControls() {
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+
+            renderer.domElement.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            renderer.domElement.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.clientX - previousMousePosition.x;
+                    const deltaY = e.clientY - previousMousePosition.y;
+                    const rotationSpeed = 0.005;
+
+                    const radius = Math.sqrt(camera.position.x * camera.position.x + camera.position.z * camera.position.z);
+                    const angle = Math.atan2(camera.position.z, camera.position.x);
+                    const newAngle = angle - deltaX * rotationSpeed;
+
+                    camera.position.x = radius * Math.cos(newAngle);
+                    camera.position.z = radius * Math.sin(newAngle);
+                    camera.position.y += deltaY * 0.5;
+                    camera.position.y = Math.max(50, Math.min(600, camera.position.y));
+
+                    camera.lookAt(0, 0, 0);
+                    previousMousePosition = { x: e.clientX, y: e.clientY };
+                }
+            });
+
+            renderer.domElement.addEventListener('mouseup', () => { isDragging = false; });
+
+            renderer.domElement.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomSpeed = 20;
+                const direction = new THREE.Vector3();
+                camera.getWorldDirection(direction);
+
+                if (e.deltaY < 0) {
+                    camera.position.addScaledVector(direction, zoomSpeed);
+                } else {
+                    camera.position.addScaledVector(direction, -zoomSpeed);
+                }
+            });
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        let lastTime = Date.now();
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (isPlaying) {
+                const currentTime = Date.now();
+                const delta = (currentTime - lastTime) / 1000 * animationSpeed;
+                lastTime = currentTime;
+
+                updateVehicles(delta);
+                simulationTime += delta;
+                document.getElementById('currentTime').textContent = simulationTime.toFixed(1) + 's';
+            } else {
+                lastTime = Date.now();
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function togglePlayPause() {
+            isPlaying = !isPlaying;
+            document.getElementById('playPauseBtn').innerHTML = isPlaying ? '⏸️ Pause' : '▶️ Play';
+        }
+
+        function resetAnimation() {
+            simulationTime = 0;
+            vehicles.forEach(v => scene.remove(v.mesh));
+            trails.forEach(t => scene.remove(t));
+            connections.forEach(c => scene.remove(c));
+            vehicles = [];
+            trails = [];
+            connections = [];
+            labels = [];
+            createVehicles();
+        }
+
+        document.getElementById('speedSlider').addEventListener('input', function (e) {
+            animationSpeed = parseFloat(e.target.value);
+            document.getElementById('speedValue').textContent = animationSpeed.toFixed(1) + 'x';
+        });
+
+        document.getElementById('showLabels').addEventListener('change', function (e) {
+            labels.forEach(label => label.visible = e.target.checked);
+        });
+
+        initScene();
+    </script>
+</body>
+
+</html>
